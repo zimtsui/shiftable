@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoEnoughElem = exports.Sortque = void 0;
-const queue_like_1 = require("deque/build/queue-like");
-Object.defineProperty(exports, "NoEnoughElem", { enumerable: true, get: function () { return queue_like_1.NoEnoughElem; } });
+const deque_1 = require("deque");
+Object.defineProperty(exports, "NoEnoughElem", { enumerable: true, get: function () { return deque_1.NoEnoughElem; } });
 const sorted_queue_1 = require("sorted-queue");
 const assert = require("assert");
 class Sortque {
-    constructor() {
-        this.sQ = new sorted_queue_1.SortedQueue();
+    constructor(cmp) {
         this.length = 0;
+        this.sQ = new sorted_queue_1.SortedQueue(cmp);
     }
     push(item) {
         this.length += 1;
@@ -19,7 +19,7 @@ class Sortque {
         return this.length;
     }
     getFront() {
-        assert(this.length > 0, new queue_like_1.NoEnoughElem());
+        assert(this.length > 0, new deque_1.NoEnoughElem());
         return this.sQ.peek().value;
     }
     shift() {

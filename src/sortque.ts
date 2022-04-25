@@ -2,15 +2,21 @@ import {
 	QueueLike,
 	Defined,
 	NoEnoughElem,
-} from 'deque/build/queue-like';
+} from 'deque';
 import { SortedQueue, SortedQueueItem } from 'sorted-queue';
 import { Removable } from './iterators';
 import assert = require('assert');
 
 
 export class Sortque<T extends Defined> implements QueueLike<T>{
-	private sQ = new SortedQueue<T>();
+	private sQ: SortedQueue<T>;
 	private length = 0;
+
+	public constructor(
+		cmp?: (a: T, b: T) => number,
+	) {
+		this.sQ = new SortedQueue(cmp);
+	}
 
 	public push(item: T): Sortque.Pointer<T> {
 		this.length += 1;
@@ -38,7 +44,7 @@ export class Sortque<T extends Defined> implements QueueLike<T>{
 }
 
 export namespace Sortque {
-	export class Pointer<T> implements Removable<T>{
+	export class Pointer<T extends Defined> implements Removable<T>{
 		private removed = false;
 
 		public constructor(
@@ -55,7 +61,6 @@ export namespace Sortque {
 			this.removed = true;
 		}
 	}
-
 }
 
 export {
