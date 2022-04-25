@@ -1,5 +1,5 @@
 export interface ElementPointer<T> {
-	getValue(): T;
+	deref(): T;
 }
 
 export interface Removable<T> extends ElementPointer<T> {

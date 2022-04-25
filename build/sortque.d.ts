@@ -15,7 +15,7 @@ export declare namespace Sortque {
         private p;
         private removed;
         constructor(p: SortedQueueItem<T>);
-        getValue(): T;
+        deref(): T;
         remove(): void;
     }
 }

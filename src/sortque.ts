@@ -51,8 +51,8 @@ export namespace Sortque {
 			private p: SortedQueueItem<T>,
 		) { }
 
-		public getValue(): T {
-			return this.getValue();
+		public deref(): T {
+			return this.deref();
 		}
 
 		public remove(): void {

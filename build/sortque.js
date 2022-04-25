@@ -35,8 +35,8 @@ exports.Sortque = Sortque;
             this.p = p;
             this.removed = false;
         }
-        getValue() {
-            return this.getValue();
+        deref() {
+            return this.deref();
         }
         remove() {
             assert(!this.removed);
