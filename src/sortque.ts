@@ -8,7 +8,7 @@ import { SortedQueue } from 'sorted-queue';
 import assert = require('assert');
 
 
-export class SortQue<T extends Defined> implements QueueLike<T>{
+export class Sortque<T extends Defined> implements QueueLike<T>{
 	private q = new SortedQueue<T>();
 	private length = 0;
 

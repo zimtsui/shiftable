@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ZeroElemShifted = exports.NoEnoughElem = exports.SortQue = void 0;
+exports.ZeroElemShifted = exports.NoEnoughElem = exports.Sortque = void 0;
 const queue_like_1 = require("deque/build/queue-like");
 Object.defineProperty(exports, "NoEnoughElem", { enumerable: true, get: function () { return queue_like_1.NoEnoughElem; } });
 Object.defineProperty(exports, "ZeroElemShifted", { enumerable: true, get: function () { return queue_like_1.ZeroElemShifted; } });
 const sorted_queue_1 = require("sorted-queue");
 const assert = require("assert");
-class SortQue {
+class Sortque {
     constructor() {
         this.q = new sorted_queue_1.SortedQueue();
         this.length = 0;
@@ -30,5 +30,5 @@ class SortQue {
         return item;
     }
 }
-exports.SortQue = SortQue;
+exports.Sortque = Sortque;
 //# sourceMappingURL=sortque.js.map
