@@ -2,20 +2,20 @@ import {
 	QueueLike,
 	Defined,
 	NoEnoughElem,
-	ZeroElemShifted,
 } from 'deque/build/queue-like';
-import { SortedQueue } from 'sorted-queue';
+import { SortedQueue, SortedQueueItem } from 'sorted-queue';
+import { Removable } from './iterators';
 import assert = require('assert');
 
 
 export class Sortque<T extends Defined> implements QueueLike<T>{
-	private q = new SortedQueue<T>();
+	private sQ = new SortedQueue<T>();
 	private length = 0;
 
-	public push(...items: T[]): void {
-		for (const item of items)
-			this.q.push(item);
-		this.length += items.length;
+	public push(item: T): Sortque.Pointer<T> {
+		this.length += 1;
+		const sQPointer = this.sQ.push(item);
+		return new Sortque.Pointer(sQPointer);
 	}
 
 	public getLength(): number {
@@ -24,26 +24,43 @@ export class Sortque<T extends Defined> implements QueueLike<T>{
 
 	public getFront(): T {
 		assert(
-			this.length >= 1,
+			this.length > 0,
 			new NoEnoughElem(),
 		);
-		return this.q.peek()!.value;
+		return this.sQ.peek()!.value;
 	}
 
-	public shift(count = 1): T {
-		assert(
-			count >= 1,
-			new ZeroElemShifted(),
-		);
+	public shift(): T {
 		const item = this.getFront();
-		this.q.pop();
+		this.sQ.pop();
 		return item;
 	}
+}
+
+export namespace Sortque {
+	export class Pointer<T> implements Removable<T>{
+		private removed = false;
+
+		public constructor(
+			private p: SortedQueueItem<T>,
+		) { }
+
+		public getValue(): T {
+			return this.getValue();
+		}
+
+		public remove(): void {
+			assert(!this.removed);
+			this.p.pop();
+			this.removed = true;
+		}
+	}
+
 }
 
 export {
 	QueueLike,
 	Defined,
 	NoEnoughElem,
-	ZeroElemShifted,
+	Removable,
 }
