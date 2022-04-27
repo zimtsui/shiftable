@@ -1,3 +1,3 @@
 export * from './sortque';
-export * from './pointer';
+export { Removable, PointerLike } from './pointer';
 export * from './priority-queue-like';

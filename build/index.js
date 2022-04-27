@@ -11,6 +11,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./sortque"), exports);
-__exportStar(require("./pointer"), exports);
 __exportStar(require("./priority-queue-like"), exports);
 //# sourceMappingURL=index.js.map

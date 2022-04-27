@@ -2,11 +2,11 @@ import { SortedQueueItem } from 'sorted-queue';
 import assert = require('assert');
 
 
-export interface ElementPointer<T> {
+export interface PointerLike<T> {
 	deref(): T;
 }
 
-export interface Removable<T> extends ElementPointer<T> {
+export interface Removable<T> extends PointerLike<T> {
 	remove(): void;
 	isRemoved(): boolean;
 }
