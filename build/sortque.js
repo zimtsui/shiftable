@@ -6,8 +6,8 @@ const pointer_1 = require("./pointer");
 const priority_queue_like_1 = require("./priority-queue-like");
 const assert = require("assert");
 class Sortque {
-    constructor(initials, cmp) {
-        this.initials = initials;
+    constructor(sortedInitials, cmp) {
+        this.sortedInitials = sortedInitials;
         this.initialPoint = null;
         this.sQ = new sorted_queue_1.SortedQueue(cmp);
     }
@@ -35,7 +35,7 @@ class Sortque {
     getFront() {
         if (this.initialPoint === null ||
             this.initialPoint.isRemoved()) {
-            const r = this.initials.next();
+            const r = this.sortedInitials.next();
             if (!r.done)
                 this.initialPoint = this.push(r.value);
         }

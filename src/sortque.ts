@@ -18,8 +18,8 @@ export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
 	private sQ: SortedQueue<T>;
 	private initialPoint: null | Removable<T> = null;
 
-	protected constructor(
-		private initials: Iterator<T>,
+	public constructor(
+		private sortedInitials: Iterator<T>,
 		cmp?: (a: T, b: T) => number,
 	) {
 		this.sQ = new SortedQueue(cmp);
@@ -55,7 +55,7 @@ export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
 			this.initialPoint === null ||
 			this.initialPoint.isRemoved()
 		) {
-			const r = this.initials.next();
+			const r = this.sortedInitials.next();
 			if (!r.done)
 				this.initialPoint = this.push(r.value);
 		}
