@@ -1,22 +1,14 @@
-import { QueueLike, Defined, NoEnoughElem } from 'deque';
-import { SortedQueueItem } from 'sorted-queue';
-import { Removable } from './iterators';
-export declare class Sortque<T extends Defined> implements QueueLike<T> {
+import { Removable } from './pointer';
+import { PriorityQueueLike } from './priority-queue-like';
+export declare type Defined = null | number | symbol | string | object | boolean;
+export declare class Sortque<T extends Defined> implements PriorityQueueLike<T> {
+    private initials;
     private sQ;
-    private length;
-    constructor(cmp?: (a: T, b: T) => number);
-    push(item: T): Sortque.Pointer<T>;
-    getLength(): number;
+    private initialPoint;
+    protected constructor(initials: Iterator<T>, cmp?: (a: T, b: T) => number);
+    [Symbol.iterator](): this;
+    next(): IteratorResult<T, void>;
+    push(x: T): Removable<T>;
     getFront(): T;
     shift(): T;
 }
-export declare namespace Sortque {
-    class Pointer<T extends Defined> implements Removable<T> {
-        private p;
-        private removed;
-        constructor(p: SortedQueueItem<T>);
-        deref(): T;
-        remove(): void;
-    }
-}
-export { QueueLike, Defined, NoEnoughElem, Removable, };

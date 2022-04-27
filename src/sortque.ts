@@ -1,39 +1,70 @@
 import {
-	QueueLike,
-	Defined,
+	SortedQueue,
+} from 'sorted-queue';
+import {
+	Removable,
+	Pointer,
+} from './pointer';
+import {
+	PriorityQueueLike,
 	NoEnoughElem,
-} from 'deque';
-import { SortedQueue, SortedQueueItem } from 'sorted-queue';
-import { Removable } from './iterators';
+} from './priority-queue-like';
 import assert = require('assert');
 
 
-export class Sortque<T extends Defined> implements QueueLike<T>{
-	private sQ: SortedQueue<T>;
-	private length = 0;
+export type Defined = null | number | symbol | string | object | boolean;
 
-	public constructor(
+export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
+	private sQ: SortedQueue<T>;
+	private initialPoint: null | Removable<T> = null;
+
+	protected constructor(
+		private initials: Iterator<T>,
 		cmp?: (a: T, b: T) => number,
 	) {
 		this.sQ = new SortedQueue(cmp);
 	}
 
-	public push(item: T): Sortque.Pointer<T> {
-		this.length += 1;
-		const sQPointer = this.sQ.push(item);
-		return new Sortque.Pointer(sQPointer);
+
+
+	public [Symbol.iterator]() {
+		return this;
 	}
 
-	public getLength(): number {
-		return this.length;
+	public next(): IteratorResult<T, void> {
+		try {
+			return {
+				done: false,
+				value: this.shift(),
+			}
+		} catch (err) {
+			return {
+				done: true,
+				value: void null,
+			}
+		}
+	}
+
+	public push(x: T): Removable<T> {
+		const sQPointer = this.sQ.push(x);
+		return new Pointer(sQPointer);
 	}
 
 	public getFront(): T {
+		if (
+			this.initialPoint === null ||
+			this.initialPoint.isRemoved()
+		) {
+			const r = this.initials.next();
+			if (!r.done)
+				this.initialPoint = this.push(r.value);
+		}
+		const item = this.sQ.peek();
 		assert(
-			this.length > 0,
+			typeof item !== 'undefined',
 			new NoEnoughElem(),
 		);
-		return this.sQ.peek()!.value;
+		return item.value;
 	}
 
 	public shift(): T {
@@ -41,31 +72,4 @@ export class Sortque<T extends Defined> implements QueueLike<T>{
 		this.sQ.pop();
 		return item;
 	}
-}
-
-export namespace Sortque {
-	export class Pointer<T extends Defined> implements Removable<T>{
-		private removed = false;
-
-		public constructor(
-			private p: SortedQueueItem<T>,
-		) { }
-
-		public deref(): T {
-			return this.deref();
-		}
-
-		public remove(): void {
-			assert(!this.removed);
-			this.p.pop();
-			this.removed = true;
-		}
-	}
-}
-
-export {
-	QueueLike,
-	Defined,
-	NoEnoughElem,
-	Removable,
 }

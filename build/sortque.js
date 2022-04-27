@@ -1,26 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NoEnoughElem = exports.Sortque = void 0;
-const deque_1 = require("deque");
-Object.defineProperty(exports, "NoEnoughElem", { enumerable: true, get: function () { return deque_1.NoEnoughElem; } });
+exports.Sortque = void 0;
 const sorted_queue_1 = require("sorted-queue");
+const pointer_1 = require("./pointer");
+const priority_queue_like_1 = require("./priority-queue-like");
 const assert = require("assert");
 class Sortque {
-    constructor(cmp) {
-        this.length = 0;
+    constructor(initials, cmp) {
+        this.initials = initials;
+        this.initialPoint = null;
         this.sQ = new sorted_queue_1.SortedQueue(cmp);
     }
-    push(item) {
-        this.length += 1;
-        const sQPointer = this.sQ.push(item);
-        return new Sortque.Pointer(sQPointer);
+    [Symbol.iterator]() {
+        return this;
     }
-    getLength() {
-        return this.length;
+    next() {
+        try {
+            return {
+                done: false,
+                value: this.shift(),
+            };
+        }
+        catch (err) {
+            return {
+                done: true,
+                value: void null,
+            };
+        }
+    }
+    push(x) {
+        const sQPointer = this.sQ.push(x);
+        return new pointer_1.Pointer(sQPointer);
     }
     getFront() {
-        assert(this.length > 0, new deque_1.NoEnoughElem());
-        return this.sQ.peek().value;
+        if (this.initialPoint === null ||
+            this.initialPoint.isRemoved()) {
+            const r = this.initials.next();
+            if (!r.done)
+                this.initialPoint = this.push(r.value);
+        }
+        const item = this.sQ.peek();
+        assert(typeof item !== 'undefined', new priority_queue_like_1.NoEnoughElem());
+        return item.value;
     }
     shift() {
         const item = this.getFront();
@@ -29,21 +50,4 @@ class Sortque {
     }
 }
 exports.Sortque = Sortque;
-(function (Sortque) {
-    class Pointer {
-        constructor(p) {
-            this.p = p;
-            this.removed = false;
-        }
-        deref() {
-            return this.deref();
-        }
-        remove() {
-            assert(!this.removed);
-            this.p.pop();
-            this.removed = true;
-        }
-    }
-    Sortque.Pointer = Pointer;
-})(Sortque = exports.Sortque || (exports.Sortque = {}));
 //# sourceMappingURL=sortque.js.map
