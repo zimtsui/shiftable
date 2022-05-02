@@ -8,7 +8,8 @@ const assert = require("assert");
 class Sortque {
     constructor(sortedInitials, cmp) {
         this.sortedInitials = sortedInitials;
-        this.initialPoint = null;
+        this.cmp = cmp;
+        this.initialPointer = null;
         this.sQ = new sorted_queue_1.SortedQueue(cmp);
     }
     [Symbol.iterator]() {
@@ -33,11 +34,14 @@ class Sortque {
         return new pointer_1.Pointer(sQPointer);
     }
     getFront() {
-        if (this.initialPoint === null ||
-            this.initialPoint.isRemoved()) {
+        if (this.initialPointer === null ||
+            this.initialPointer.isRemoved()) {
             const r = this.sortedInitials.next();
-            if (!r.done)
-                this.initialPoint = this.push(r.value);
+            if (!r.done) {
+                if (this.initialPointer !== null)
+                    assert(this.cmp(r.value, this.initialPointer.deref()) >= 0);
+                this.initialPointer = this.push(r.value);
+            }
         }
         const item = this.sQ.peek();
         assert(typeof item !== 'undefined', new priority_queue_like_1.NoEnoughElem());

@@ -16,16 +16,14 @@ export type Defined = null | number | symbol | string | object | boolean;
 
 export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
 	private sQ: SortedQueue<T>;
-	private initialPoint: null | Removable<T> = null;
+	private initialPointer: null | Removable<T> = null;
 
 	public constructor(
 		private sortedInitials: Iterator<T>,
-		cmp?: (a: T, b: T) => number,
+		private cmp: (a: T, b: T) => number,
 	) {
 		this.sQ = new SortedQueue(cmp);
 	}
-
-
 
 	public [Symbol.iterator]() {
 		return this;
@@ -52,12 +50,18 @@ export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
 
 	public getFront(): T {
 		if (
-			this.initialPoint === null ||
-			this.initialPoint.isRemoved()
+			this.initialPointer === null ||
+			this.initialPointer.isRemoved()
 		) {
 			const r = this.sortedInitials.next();
-			if (!r.done)
-				this.initialPoint = this.push(r.value);
+			if (!r.done) {
+				if (this.initialPointer !== null)
+					assert(this.cmp(
+						r.value,
+						this.initialPointer.deref(),
+					) >= 0);
+				this.initialPointer = this.push(r.value);
+			}
 		}
 		const item = this.sQ.peek();
 		assert(
