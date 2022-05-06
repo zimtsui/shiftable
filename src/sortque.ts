@@ -1,6 +1,4 @@
-import {
-	SortedQueue,
-} from 'sorted-queue';
+import { SortedQueue } from 'sorted-queue';
 import {
 	Removable,
 	Pointer,
