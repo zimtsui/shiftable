@@ -1,16 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Sortque = void 0;
-const sorted_queue_1 = require("sorted-queue");
-const pointer_1 = require("./pointer");
-const priority_queue_like_1 = require("./priority-queue-like");
-const assert = require("assert");
+exports.Sortque = exports.Pointer = exports.NoEnoughElem = exports.AlreadyRemoved = void 0;
+const binary_heap_1 = require("binary-heap");
+const merge_1 = require("./merge");
+var binary_heap_2 = require("binary-heap");
+Object.defineProperty(exports, "AlreadyRemoved", { enumerable: true, get: function () { return binary_heap_2.AlreadyRemoved; } });
+Object.defineProperty(exports, "NoEnoughElem", { enumerable: true, get: function () { return binary_heap_2.NoEnoughElem; } });
+Object.defineProperty(exports, "Pointer", { enumerable: true, get: function () { return binary_heap_2.Pointer; } });
 class Sortque {
-    constructor(sortedInitials, cmp) {
-        this.sortedInitials = sortedInitials;
+    constructor(cmp) {
         this.cmp = cmp;
-        this.initialPointer = null;
-        this.sQ = new sorted_queue_1.SortedQueue(cmp);
+        // null 表示 fill 记录以清空
+        this.lastFilled = null;
+        this.sorted = null;
+        this.heap = new binary_heap_1.Heap(cmp);
     }
     [Symbol.iterator]() {
         return this;
@@ -30,27 +33,34 @@ class Sortque {
         }
     }
     push(x) {
-        const sQPointer = this.sQ.push(x);
-        return new pointer_1.Pointer(sQPointer);
+        return this.heap.push(x);
+    }
+    pushSorted(sorted) {
+        if (this.sorted === null) {
+            this.sorted = sorted;
+            return;
+        }
+        this.sorted = (0, merge_1.sortMerge)(this.cmp)(this.sorted, sorted);
+        this.lastFilled = null;
+    }
+    tryFill() {
+        if (this.sorted === null)
+            return;
+        if (this.lastFilled && !this.lastFilled.isRemoved())
+            return;
+        const r = this.sorted.next();
+        if (!r.done)
+            this.lastFilled = this.heap.push(r.value);
+        else
+            this.sorted = null;
     }
     getFront() {
-        if (this.initialPointer === null ||
-            this.initialPointer.isRemoved()) {
-            const r = this.sortedInitials.next();
-            if (!r.done) {
-                if (this.initialPointer !== null)
-                    assert(this.cmp(r.value, this.initialPointer.deref()) >= 0);
-                this.initialPointer = this.push(r.value);
-            }
-        }
-        const item = this.sQ.peek();
-        assert(typeof item !== 'undefined', new priority_queue_like_1.NoEnoughElem());
-        return item.value;
+        this.tryFill();
+        return this.heap.getFront();
     }
     shift() {
-        const item = this.getFront();
-        this.sQ.pop();
-        return item;
+        this.tryFill();
+        return this.heap.shift();
     }
 }
 exports.Sortque = Sortque;

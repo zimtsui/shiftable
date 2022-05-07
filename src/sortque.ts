@@ -1,26 +1,23 @@
-import { SortedQueue } from 'sorted-queue';
-import {
-	Removable,
-	Pointer,
-} from './pointer';
-import {
-	PriorityQueueLike,
+import { Heap, Pointer } from 'binary-heap';
+import { sortMerge } from './merge';
+
+export {
+	AlreadyRemoved,
 	NoEnoughElem,
-} from './priority-queue-like';
-import assert = require('assert');
+	Pointer,
+} from 'binary-heap';
 
 
-export type Defined = null | number | symbol | string | object | boolean;
-
-export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
-	private sQ: SortedQueue<T>;
-	private initialPointer: null | Removable<T> = null;
+export class Sortque<T> implements IterableIterator<T>{
+	private heap: Heap<T>;
+	// null 表示 fill 记录以清空
+	private lastFilled: null | Pointer<T> = null;
+	private sorted: Iterator<T> | null = null;
 
 	public constructor(
-		private sortedInitials: Iterator<T>,
-		private cmp: (a: T, b: T) => number,
+		private cmp: (x1: T, x2: T) => boolean,
 	) {
-		this.sQ = new SortedQueue(cmp);
+		this.heap = new Heap(cmp);
 	}
 
 	public [Symbol.iterator]() {
@@ -32,46 +29,48 @@ export class Sortque<T extends Defined> implements PriorityQueueLike<T>{
 			return {
 				done: false,
 				value: this.shift(),
-			}
+			};
 		} catch (err) {
 			return {
 				done: true,
 				value: void null,
-			}
+			};
 		}
 	}
 
-	public push(x: T): Removable<T> {
-		const sQPointer = this.sQ.push(x);
-		return new Pointer(sQPointer);
+	public push(x: T): Pointer<T> {
+		return this.heap.push(x);
+	}
+
+	public pushSorted(sorted: Iterator<T>): void {
+		if (this.sorted === null) {
+			this.sorted = sorted;
+			return;
+		}
+		this.sorted = sortMerge<T>(this.cmp)(
+			this.sorted,
+			sorted,
+		);
+		this.lastFilled = null;
+	}
+
+	private tryFill(): void {
+		if (this.sorted === null) return;
+		if (this.lastFilled && !this.lastFilled.isRemoved()) return;
+		const r = this.sorted.next();
+		if (!r.done)
+			this.lastFilled = this.heap.push(r.value);
+		else
+			this.sorted = null;
 	}
 
 	public getFront(): T {
-		if (
-			this.initialPointer === null ||
-			this.initialPointer.isRemoved()
-		) {
-			const r = this.sortedInitials.next();
-			if (!r.done) {
-				if (this.initialPointer !== null)
-					assert(this.cmp(
-						r.value,
-						this.initialPointer.deref(),
-					) >= 0);
-				this.initialPointer = this.push(r.value);
-			}
-		}
-		const item = this.sQ.peek();
-		assert(
-			typeof item !== 'undefined',
-			new NoEnoughElem(),
-		);
-		return item.value;
+		this.tryFill();
+		return this.heap.getFront();
 	}
 
 	public shift(): T {
-		const item = this.getFront();
-		this.sQ.pop();
-		return item;
+		this.tryFill();
+		return this.heap.shift();
 	}
 }
