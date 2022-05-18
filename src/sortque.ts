@@ -1,23 +1,20 @@
-import { Heap, Pointer } from 'binary-heap';
-import { sortMerge } from './merge';
-
-export {
-	AlreadyRemoved,
-	NoEnoughElem,
-	Pointer,
+import {
+	Heap, Pointer,
+	Cmp,
 } from 'binary-heap';
+import { sortMerge2 } from './merge';
 
 
 export class Sortque<T> implements IterableIterator<T>{
 	private heap: Heap<T>;
-	// null 表示 fill 记录以清空
-	private lastFilled: null | Pointer<T> = null;
-	private sorted: Iterator<T> | null = null;
+	private r: IteratorResult<T>;
 
 	public constructor(
-		private cmp: (x1: T, x2: T) => boolean,
+		private cmp: Cmp<T>,
+		private sorted: Iterator<T> = (function* () { })(),
 	) {
 		this.heap = new Heap(cmp);
+		this.r = this.sorted.next();
 	}
 
 	public [Symbol.iterator]() {
@@ -43,34 +40,42 @@ export class Sortque<T> implements IterableIterator<T>{
 	}
 
 	public pushSorted(sorted: Iterator<T>): void {
-		if (this.sorted === null) {
+		if (!this.r.done) {
+			this.heap.push(this.r.value);
+			this.sorted = sortMerge2(this.cmp)(
+				this.sorted,
+				sorted,
+			);
+		} else
 			this.sorted = sorted;
-			return;
-		}
-		this.sorted = sortMerge<T>(this.cmp)(
-			this.sorted,
-			sorted,
-		);
-		this.lastFilled = null;
-	}
-
-	private tryFill(): void {
-		if (this.sorted === null) return;
-		if (this.lastFilled && !this.lastFilled.isRemoved()) return;
-		const r = this.sorted.next();
-		if (!r.done)
-			this.lastFilled = this.heap.push(r.value);
-		else
-			this.sorted = null;
+		this.shiftUndoneSorted();
 	}
 
 	public getFront(): T {
-		this.tryFill();
-		return this.heap.getFront();
+		if (this.r.done) return this.heap.getFront();
+		if (this.heap.getSize() === 0) return this.r.value;
+		return this.cmp(this.heap.getFront(), this.r.value) <= 0
+			? this.heap.getFront()
+			: this.r.value;
+	}
+
+	private shiftUndoneSorted(): T {
+		const x = this.r.value;
+		this.r = this.sorted.next();
+		return x;
 	}
 
 	public shift(): T {
-		this.tryFill();
-		return this.heap.shift();
+		if (this.r.done) return this.heap.shift();
+		if (this.heap.getSize() === 0) return this.shiftUndoneSorted();
+		if (this.cmp(this.heap.getFront(), this.r.value) <= 0)
+			return this.heap.shift();
+		else
+			return this.shiftUndoneSorted();
+	}
+
+	public getSize(): number {
+		if (this.r.done && this.heap.getSize() === 0) return 0;
+		return Number.POSITIVE_INFINITY;
 	}
 }
