@@ -1,7 +1,2 @@
 export * from './sortque';
-export * from './merge';
-export {
-	AlreadyRemoved,
-	Pointer,
-	NoEnoughElements,
-} from 'binary-heap';
+export { PointerLike } from 'binary-heap';

@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -b ./src/tsconfig.json",
-    "clean": "rm -rf ./build"
+    "clean": "rm -rf ./build",
+    "docs": "typedoc --tsconfig ./src/tsconfig.json --excludePrivate --excludeProtected ./src/index.ts"
   },
   "author": "Zim",
   "dependencies": {

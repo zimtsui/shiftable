@@ -1,20 +1,23 @@
 import {
-	Heap, Pointer,
+	Heap, PointerLike,
 	Cmp,
 } from 'binary-heap';
 import { sortMerge2 } from './merge';
+import { Seq } from './seq';
 
 
 export class Sortque<T> implements IterableIterator<T>{
 	private heap: Heap<T>;
 	private r: IteratorResult<T>;
+	private sortedIt: Iterator<T>;
 
 	public constructor(
 		private cmp: Cmp<T>,
-		private sorted: Iterator<T> = (function* () { })(),
+		sortedSeq: Iterable<T> = [],
 	) {
 		this.heap = new Heap(cmp);
-		this.r = this.sorted.next();
+		this.sortedIt = sortedSeq[Symbol.iterator]();
+		this.r = this.sortedIt.next();
 	}
 
 	public [Symbol.iterator]() {
@@ -35,22 +38,25 @@ export class Sortque<T> implements IterableIterator<T>{
 		}
 	}
 
-	public push(x: T): Pointer<T> {
+	public push(x: T): PointerLike<T> {
 		return this.heap.push(x);
 	}
 
-	public pushSorted(sorted: Iterator<T>): void {
+	public pushSorted(sortedSeq: Iterable<T>): void {
 		if (!this.r.done) {
 			this.heap.push(this.r.value);
-			this.sorted = sortMerge2(this.cmp)(
-				this.sorted,
-				sorted,
-			);
+			this.sortedIt = sortMerge2(this.cmp)(
+				new Seq(this.sortedIt),
+				sortedSeq,
+			)[Symbol.iterator]();
 		} else
-			this.sorted = sorted;
+			this.sortedIt = sortedSeq[Symbol.iterator]();
 		this.shiftUndoneSorted();
 	}
 
+	/**
+	 * @throws RangeError
+	 */
 	public getFront(): T {
 		if (this.r.done) return this.heap.getFront();
 		if (this.heap.getSize() === 0) return this.r.value;
@@ -61,10 +67,13 @@ export class Sortque<T> implements IterableIterator<T>{
 
 	private shiftUndoneSorted(): T {
 		const x = this.r.value;
-		this.r = this.sorted.next();
+		this.r = this.sortedIt.next();
 		return x;
 	}
 
+	/**
+	 * @throws RangeError
+	 */
 	public shift(): T {
 		if (this.r.done) return this.heap.shift();
 		if (this.heap.getSize() === 0) return this.shiftUndoneSorted();
@@ -74,6 +83,9 @@ export class Sortque<T> implements IterableIterator<T>{
 			return this.shiftUndoneSorted();
 	}
 
+	/**
+	 * @returns 0 or Number.POSITIVE_INFINITY.
+	 */
 	public getSize(): number {
 		if (this.r.done && this.heap.getSize() === 0) return 0;
 		return Number.POSITIVE_INFINITY;

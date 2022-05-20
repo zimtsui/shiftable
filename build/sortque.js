@@ -3,12 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Sortque = void 0;
 const binary_heap_1 = require("binary-heap");
 const merge_1 = require("./merge");
+const seq_1 = require("./seq");
 class Sortque {
-    constructor(cmp, sorted = (function* () { })()) {
+    constructor(cmp, sortedSeq = []) {
         this.cmp = cmp;
-        this.sorted = sorted;
         this.heap = new binary_heap_1.Heap(cmp);
-        this.r = this.sorted.next();
+        this.sortedIt = sortedSeq[Symbol.iterator]();
+        this.r = this.sortedIt.next();
     }
     [Symbol.iterator]() {
         return this;
@@ -30,15 +31,18 @@ class Sortque {
     push(x) {
         return this.heap.push(x);
     }
-    pushSorted(sorted) {
+    pushSorted(sortedSeq) {
         if (!this.r.done) {
             this.heap.push(this.r.value);
-            this.sorted = (0, merge_1.sortMerge2)(this.cmp)(this.sorted, sorted);
+            this.sortedIt = (0, merge_1.sortMerge2)(this.cmp)(new seq_1.Seq(this.sortedIt), sortedSeq)[Symbol.iterator]();
         }
         else
-            this.sorted = sorted;
+            this.sortedIt = sortedSeq[Symbol.iterator]();
         this.shiftUndoneSorted();
     }
+    /**
+     * @throws RangeError
+     */
     getFront() {
         if (this.r.done)
             return this.heap.getFront();
@@ -50,9 +54,12 @@ class Sortque {
     }
     shiftUndoneSorted() {
         const x = this.r.value;
-        this.r = this.sorted.next();
+        this.r = this.sortedIt.next();
         return x;
     }
+    /**
+     * @throws RangeError
+     */
     shift() {
         if (this.r.done)
             return this.heap.shift();
@@ -63,6 +70,9 @@ class Sortque {
         else
             return this.shiftUndoneSorted();
     }
+    /**
+     * @returns 0 or Number.POSITIVE_INFINITY.
+     */
     getSize() {
         if (this.r.done && this.heap.getSize() === 0)
             return 0;

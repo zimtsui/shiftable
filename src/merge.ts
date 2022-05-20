@@ -2,9 +2,11 @@ import { Cmp } from 'binary-heap';
 
 
 export const sortMerge2 = <T>(cmp: Cmp<T>) => function* (
-	it1: Iterator<T>,
-	it2: Iterator<T>,
-): Generator<T, void> {
+	seq1: Iterable<T>,
+	seq2: Iterable<T>,
+): Iterable<T> {
+	const it1 = seq1[Symbol.iterator]();
+	const it2 = seq2[Symbol.iterator]();
 	try {
 		let r1 = it1.next();
 		let r2 = it2.next();
@@ -30,5 +32,5 @@ export const sortMerge2 = <T>(cmp: Cmp<T>) => function* (
 }
 
 export const sortMerge = <T>(cmp: Cmp<T>) =>
-	(...iterators: Iterator<T>[]) =>
-		iterators.reduce(sortMerge2(cmp));
+	(...seqs: Iterable<T>[]) =>
+		seqs.reduce(sortMerge2(cmp));
