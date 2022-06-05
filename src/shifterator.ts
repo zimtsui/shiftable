@@ -2,11 +2,19 @@ import { Shiftable } from './shiftable';
 import assert = require('assert');
 
 
-export class ShiftableFromIterator<T> implements Shiftable<T> {
+export class Shifterator<T> implements Shiftable<T> {
 	public constructor(
 		private it: Iterator<T>,
 		private r: IteratorResult<T>,
 	) { }
+
+	public static fromIterable<T>(iterable: Iterable<T>) {
+		const it = iterable[Symbol.iterator]();
+		return new Shifterator(
+			it,
+			it.next(),
+		);
+	}
 
 	public i(index: 0): T {
 		assert(

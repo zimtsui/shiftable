@@ -12,6 +12,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./shiftable"), exports);
 __exportStar(require("./merged"), exports);
-__exportStar(require("./shiftable-from-iterator"), exports);
+__exportStar(require("./shifterator"), exports);
 __exportStar(require("./affiliation"), exports);
 //# sourceMappingURL=index.js.map
