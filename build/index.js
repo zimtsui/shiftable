@@ -13,6 +13,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./shiftable"), exports);
 __exportStar(require("./merged"), exports);
 __exportStar(require("./shiftable-from-iterator"), exports);
-__exportStar(require("./shiftable-heap"), exports);
 __exportStar(require("./affiliation"), exports);
 //# sourceMappingURL=index.js.map

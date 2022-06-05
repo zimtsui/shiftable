@@ -1,4 +1,4 @@
-import { Cmp } from '@zimtsui/binary-heap';
+import { Cmp } from './cmp';
 import { Shiftable } from './shiftable';
 export declare class Affiliation<T> implements Shiftable<T>, Iterable<T> {
     private cmp;
