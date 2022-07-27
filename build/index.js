@@ -14,4 +14,5 @@ __exportStar(require("./shiftable"), exports);
 __exportStar(require("./merged"), exports);
 __exportStar(require("./shifterator"), exports);
 __exportStar(require("./affiliation"), exports);
+__exportStar(require("./cmp"), exports);
 //# sourceMappingURL=index.js.map
