@@ -11,6 +11,9 @@ class Shifterator {
         const it = iterable[Symbol.iterator]();
         return new Shifterator(it, it.next());
     }
+    static fromIterator(it, r) {
+        return new Shifterator(it, r);
+    }
     i(index) {
         assert(!this.r.done, new RangeError());
         return this.r.value;
